@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License",
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -17,6 +17,7 @@
 package com.android.loganalysis;
 
 import com.android.loganalysis.item.BatteryDischargeItemTest;
+import com.android.loganalysis.item.DvmLockSampleItemTest;
 import com.android.loganalysis.item.GenericItemTest;
 import com.android.loganalysis.item.InterruptItemTest;
 import com.android.loganalysis.item.MemInfoItemTest;
@@ -30,6 +31,9 @@ import com.android.loganalysis.parser.AbstractSectionParserTest;
 import com.android.loganalysis.parser.AnrParserTest;
 import com.android.loganalysis.parser.BugreportParserTest;
 import com.android.loganalysis.parser.CompactMemInfoParserTest;
+import com.android.loganalysis.parser.DmesgParserTest;
+import com.android.loganalysis.parser.DvmLockSampleParserTest;
+import com.android.loganalysis.parser.EventsLogParserTest;
 import com.android.loganalysis.parser.InterruptParserTest;
 import com.android.loganalysis.parser.JavaCrashParserTest;
 import com.android.loganalysis.parser.KernelLogParserTest;
@@ -51,63 +55,63 @@ import com.android.loganalysis.util.config.ArgsOptionParserTest;
 import com.android.loganalysis.util.config.OptionSetterTest;
 import com.android.loganalysis.util.config.OptionUpdateRuleTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * A test suite for all Trade Federation unit tests.
  * <p/>
  * All tests listed here should be self-contained, and should not require any external dependencies.
  */
-public class UnitTests extends TestSuite {
+@RunWith(Suite.class)
+@SuiteClasses({
+    // item
+    BatteryDischargeItemTest.class,
+    DvmLockSampleItemTest.class,
+    GenericItemTest.class,
+    InterruptItemTest.class,
+    MemInfoItemTest.class,
+    MonkeyLogItemTest.class,
+    ProcrankItemTest.class,
+    SmartMonkeyLogItemTest.class,
+    SystemPropsItemTest.class,
+    TopItemTest.class,
+    WakelockItemTest.class,
 
-    public UnitTests() {
-        super();
+    // parser
+    AbstractSectionParserTest.class,
+    AnrParserTest.class,
+    BugreportParserTest.class,
+    CompactMemInfoParserTest.class,
+    DmesgParserTest.class,
+    EventsLogParserTest.class,
+    DvmLockSampleParserTest.class,
+    InterruptParserTest.class,
+    JavaCrashParserTest.class,
+    KernelLogParserTest.class,
+    LogcatParserTest.class,
+    MemInfoParserTest.class,
+    MonkeyLogParserTest.class,
+    NativeCrashParserTest.class,
+    ProcessUsageParserTest.class,
+    ProcrankParserTest.class,
+    SystemPropsParserTest.class,
+    TopParserTest.class,
+    TracesParserTest.class,
+    WakelockParserTest.class,
 
-        // item
-        addTestSuite(BatteryDischargeItemTest.class);
-        addTestSuite(GenericItemTest.class);
-        addTestSuite(InterruptItemTest.class);
-        addTestSuite(MemInfoItemTest.class);
-        addTestSuite(MonkeyLogItemTest.class);
-        addTestSuite(ProcrankItemTest.class);
-        addTestSuite(SmartMonkeyLogItemTest.class);
-        addTestSuite(SystemPropsItemTest.class);
-        addTestSuite(TopItemTest.class);
-        addTestSuite(WakelockItemTest.class);
+    // util
+    ArrayUtilTest.class,
+    LogPatternUtilTest.class,
+    LogTailUtilTest.class,
+    RegexTrieTest.class,
 
-        // parser
-        addTestSuite(AbstractSectionParserTest.class);
-        addTestSuite(AnrParserTest.class);
-        addTestSuite(BugreportParserTest.class);
-        addTestSuite(CompactMemInfoParserTest.class);
-        addTestSuite(InterruptParserTest.class);
-        addTestSuite(JavaCrashParserTest.class);
-        addTestSuite(KernelLogParserTest.class);
-        addTestSuite(LogcatParserTest.class);
-        addTestSuite(MemInfoParserTest.class);
-        addTestSuite(MonkeyLogParserTest.class);
-        addTestSuite(NativeCrashParserTest.class);
-        addTestSuite(ProcessUsageParserTest.class);
-        addTestSuite(ProcrankParserTest.class);
-        addTestSuite(SystemPropsParserTest.class);
-        addTestSuite(TopParserTest.class);
-        addTestSuite(TracesParserTest.class);
-        addTestSuite(WakelockParserTest.class);
-
-        // util
-        addTestSuite(ArrayUtilTest.class);
-        addTestSuite(LogPatternUtilTest.class);
-        addTestSuite(LogTailUtilTest.class);
-        addTestSuite(RegexTrieTest.class);
-
-        // util.config
-        addTestSuite(ArgsOptionParserTest.class);
-        addTestSuite(OptionSetterTest.class);
-        addTestSuite(OptionUpdateRuleTest.class);
-    }
-
-    public static Test suite() {
-        return new UnitTests();
-    }
+    // util.config
+    ArgsOptionParserTest.class,
+    OptionSetterTest.class,
+    OptionUpdateRuleTest.class,
+})
+public class UnitTests {
+    // empty of purpose
 }
