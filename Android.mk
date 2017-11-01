@@ -20,10 +20,11 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_JAVACFLAGS += -g -Xlint
+-include tools/tradefederation/core/error_prone_rules.mk
 
 LOCAL_MODULE := loganalysis
 LOCAL_MODULE_TAGS := optional
-LOCAL_STATIC_JAVA_LIBRARIES := guava-15.0-prebuilt json-prebuilt junit-host
+LOCAL_STATIC_JAVA_LIBRARIES := guava-18.0-prebuilt json-prebuilt junit-host
 
 include $(BUILD_HOST_JAVA_LIBRARY)
 

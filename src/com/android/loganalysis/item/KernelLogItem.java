@@ -51,6 +51,8 @@ public class KernelLogItem extends GenericItem {
     public KernelLogItem() {
         super(ATTRIBUTES);
 
+        setAttribute(START_TIME, Double.valueOf(0.0));
+        setAttribute(STOP_TIME, Double.valueOf(0.0));
         setAttribute(EVENTS, new ItemList());
     }
 
@@ -122,6 +124,32 @@ public class KernelLogItem extends GenericItem {
         for (MiscKernelLogItem item : getEvents()) {
             if (item instanceof SELinuxItem) {
                 items.add((SELinuxItem)item);
+            }
+        }
+        return items;
+    }
+
+    /**
+     * Get the list of all {@link LowMemoryKillerItem} events.
+     */
+    public List<LowMemoryKillerItem> getLowMemoryKillerEvents() {
+        List<LowMemoryKillerItem> items = new LinkedList<LowMemoryKillerItem>();
+        for (MiscKernelLogItem item : getEvents()) {
+            if (item instanceof LowMemoryKillerItem) {
+                items.add((LowMemoryKillerItem)item);
+            }
+        }
+        return items;
+    }
+
+    /**
+     * Get the list of all {@link PageAllocationFailureItem} events.
+     */
+    public List<PageAllocationFailureItem> getPageAllocationFailureEvents() {
+        List<PageAllocationFailureItem> items = new LinkedList<PageAllocationFailureItem>();
+        for (MiscKernelLogItem item : getEvents()) {
+            if (item instanceof PageAllocationFailureItem) {
+                items.add((PageAllocationFailureItem)item);
             }
         }
         return items;
