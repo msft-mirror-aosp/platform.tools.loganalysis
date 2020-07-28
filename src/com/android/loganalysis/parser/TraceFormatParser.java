@@ -85,7 +85,7 @@ public class TraceFormatParser implements IParser {
     /** Parse a trace format line and return an {@link TraceFormatItem} */
     @Override
     public TraceFormatItem parse(List<String> lines) {
-        // sanity check
+        // Validity check
         if (lines == null || lines.size() != 1) {
             throw new RuntimeException("Cannot parse format line: expect one-line trace format");
         }
