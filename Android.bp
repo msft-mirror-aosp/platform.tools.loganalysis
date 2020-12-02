@@ -20,6 +20,7 @@ java_library_host {
 
   libs: [
     "guava",
+    "junit",
     "json-prebuilt",
   ],
 }
