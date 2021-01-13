@@ -22,7 +22,7 @@ java_library_host {
     libs: [
         "loganalysis",
         "json-prebuilt",
-        "junit-host",
+        "junit",
         "easymock",
     ],
 }
