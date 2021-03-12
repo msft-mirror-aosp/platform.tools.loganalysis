@@ -33,6 +33,8 @@ public class DmesgItem extends GenericItem {
 
     private List<DmesgActionInfoItem> mActionInfoItems = new ArrayList<>();
 
+    private Map<String, DmesgModuleInfoItem> mModuleInfoItems = new HashMap<>();
+
     public DmesgItem() {
         super(Collections.emptySet());
     }
@@ -80,4 +82,16 @@ public class DmesgItem extends GenericItem {
         mActionInfoItems.add(actionInfoItem);
     }
 
+    /** @return moduleInfoItem */
+    public Map<String, DmesgModuleInfoItem> getModuleInfoItems() {
+        return mModuleInfoItems;
+    }
+
+    /**
+     * @param key to identify module info item
+     * @param moduleInfoItem to be added to the list
+     */
+    public void addModuleInfoItem(String key, DmesgModuleInfoItem moduleInfoItem) {
+        mModuleInfoItems.put(key, moduleInfoItem);
+    }
 }
