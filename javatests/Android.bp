@@ -21,7 +21,7 @@ java_test_host {
     defaults: ["tradefed_defaults"],
 
     // Only compile source java files in this lib.
-    srcs: ["src/**/*.java"],
+    srcs: ["com/**/*.java"],
 
     static_libs: [
         "loganalysis",
