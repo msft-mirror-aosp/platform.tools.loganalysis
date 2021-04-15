@@ -16,17 +16,17 @@ package {
     default_applicable_licenses: ["Android-Apache-2.0"],
 }
 
-java_library_host {
+java_test_host {
     name: "loganalysis-tests",
     defaults: ["tradefed_defaults"],
 
     // Only compile source java files in this lib.
-    srcs: ["src/**/*.java"],
+    srcs: ["com/**/*.java"],
 
-    libs: [
+    static_libs: [
         "loganalysis",
         "json-prebuilt",
         "junit",
-        "easymock",
+        "guava",
     ],
 }
