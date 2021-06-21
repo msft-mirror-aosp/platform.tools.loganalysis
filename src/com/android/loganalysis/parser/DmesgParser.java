@@ -20,6 +20,7 @@ import com.android.loganalysis.item.DmesgActionInfoItem;
 import com.android.loganalysis.item.DmesgItem;
 import com.android.loganalysis.item.DmesgServiceInfoItem;
 import com.android.loganalysis.item.DmesgStageInfoItem;
+import com.android.loganalysis.item.DmesgModuleInfoItem;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -44,6 +45,8 @@ public class DmesgParser implements IParser {
     private static final String DURATION = "DURATION";
     private static final String UEVENTD = "ueventd";
     private static final String INIT = "init";
+    private static final String WAIT_PROPERTY = "Wait for property ";
+    private static final String TOTAL_MODULE = "TOTAL_MODULE";
 
     // Matches: [ 14.822691] init:
     private static final String SERVICE_PREFIX = String.format("^\\[\\s+(?<%s>.*)\\] init:\\s+",
@@ -82,14 +85,34 @@ public class DmesgParser implements IParser {
     private static final Pattern START_PROCESSING_ACTION =
             Pattern.compile(String.format("%s%s", SERVICE_PREFIX, START_PROCESSING_ACTION_PREFIX));
 
+    // Matches: [    1.175984] [    T1] init: Loaded 198 kernel modules took 808 ms
+    private static final Pattern MODULES_INFO =
+            Pattern.compile(
+                    String.format(
+                            "%sLoaded (?<count>\\d+) kernel modules took (?<%s>\\d+) ms.*$",
+                            SERVICE_PREFIX, DURATION));
+
+    // Matches: [    0.503853] [    T1] init: Loading module /lib/modules/exynos_dit.ko with args ''
+    private static final Pattern MODULE_LOADING =
+            Pattern.compile(
+                    String.format(
+                            "%sLoading module \\S+\\/(?<koname>\\S+)\\.ko with args.*",
+                            SERVICE_PREFIX));
+
+    // Matches: [    0.503803] [    T1] init: Loaded kernel module /lib/modules/boot_device_spi.ko
+    private static final Pattern MODULE_LOADED =
+            Pattern.compile(
+                    String.format(
+                            "%sLoaded kernel module \\S+\\/(?<koname>\\S+)\\.ko", SERVICE_PREFIX));
+
     // Matches: [    3.791635] ueventd: Coldboot took 0.695055 seconds
     private static final String STAGE_SUFFIX= String.format(
             "(?<%s>.*)\\s+took\\s+(?<%s>.*)\\s+seconds$", STAGE, DURATION);
     private static final Pattern UEVENTD_STAGE_INFO = Pattern.compile(
             String.format("%s%s", UEVENTD_PREFIX, STAGE_SUFFIX));
 
-    private static final String PROPERTY_SUFFIX= String.format(
-            "(?<%s>.*)\\s+took\\s+(?<%s>.*)ms$", STAGE, DURATION);
+    private static final String PROPERTY_SUFFIX =
+            String.format("Wait for property\\s(?<%s>.*)\\s+took\\s+(?<%s>.*)ms$", STAGE, DURATION);
     // Matches [    7.270487] init: Wait for property 'apexd.status=ready' took 230ms
     private static final Pattern WAIT_FOR_PROPERTY_INFO = Pattern.compile(
             String.format("%s%s", SERVICE_PREFIX, PROPERTY_SUFFIX));
@@ -149,6 +172,9 @@ public class DmesgParser implements IParser {
             return;
         }
         if (parseActionInfo(line)) {
+            return;
+        }
+        if (parseModuleInfo(line)) {
             return;
         }
     }
@@ -214,7 +240,8 @@ public class DmesgParser implements IParser {
         }
         if((match = matches(WAIT_FOR_PROPERTY_INFO, line)) != null) {
             DmesgStageInfoItem stageInfoItem = new DmesgStageInfoItem();
-            stageInfoItem.setStageName(String.format("%s_%s", INIT, match.group(STAGE)));
+            stageInfoItem.setStageName(
+                    String.format("%s_%s%s", INIT, WAIT_PROPERTY, match.group(STAGE)));
             stageInfoItem.setDuration((long) Double.parseDouble(match.group(DURATION)));
             mDmesgItem.addStageInfoItem(stageInfoItem);
             return true;
@@ -249,6 +276,44 @@ public class DmesgParser implements IParser {
     }
 
     /**
+     * Parse modules from each {@code line} of dmesg log and store the module name and loading time
+     * in {@link DmesgModuleInfoItem} object
+     *
+     * @param individual {@code line} of the dmesg log
+     * @return {@code true}, if {@code line} indicates start, end of a module loading or the summary
+     *     {@code false}, otherwise
+     */
+    @VisibleForTesting
+    boolean parseModuleInfo(String line) {
+        Matcher match = null;
+        if ((match = matches(MODULES_INFO, line)) != null) {
+            DmesgModuleInfoItem moduleInfoItem = new DmesgModuleInfoItem();
+            moduleInfoItem.setModuleName(TOTAL_MODULE);
+            moduleInfoItem.setModuleDuration((long) Double.parseDouble(match.group(DURATION)));
+            moduleInfoItem.setModuleCount(match.group("count"));
+            mDmesgItem.addModuleInfoItem(TOTAL_MODULE, moduleInfoItem);
+            return true;
+        }
+
+        if ((match = matches(MODULE_LOADING, line)) != null) {
+            DmesgModuleInfoItem moduleInfoItem = new DmesgModuleInfoItem();
+            moduleInfoItem.setModuleName(match.group("koname"));
+            moduleInfoItem.setStartTime((long) (Double.parseDouble(match.group(TIMESTAMP)) * 1000));
+            mDmesgItem.addModuleInfoItem(match.group("koname"), moduleInfoItem);
+            return true;
+        } else if ((match = matches(MODULE_LOADED, line)) != null) {
+            if (getModuleInfoItems().containsKey(match.group("koname"))) {
+                DmesgModuleInfoItem moduleInfoItem =
+                        getModuleInfoItems().get(match.group("koname"));
+                moduleInfoItem.setEndTime(
+                        (long) (Double.parseDouble(match.group(TIMESTAMP)) * 1000));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Checks whether {@code line} matches the given {@link Pattern}.
      *
      * @return The resulting {@link Matcher} obtained by matching the {@code line} against
@@ -277,4 +342,7 @@ public class DmesgParser implements IParser {
         return mDmesgItem.getActionInfoItems();
     }
 
+    public Map<String, DmesgModuleInfoItem> getModuleInfoItems() {
+        return mDmesgItem.getModuleInfoItems();
+    }
 }
