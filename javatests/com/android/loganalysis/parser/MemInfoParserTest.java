@@ -44,12 +44,12 @@ public class MemInfoParserTest extends TestCase {
         MemInfoItem item = new MemInfoParser().parse(inputBlock);
 
         assertEquals(6, item.size());
-        assertEquals((Long)353332l, item.get("MemTotal"));
-        assertEquals((Long)65420l, item.get("MemFree"));
-        assertEquals((Long)20800l, item.get("Buffers"));
-        assertEquals((Long)86204l, item.get("Cached"));
-        assertEquals((Long)0l, item.get("SwapCached"));
-        assertEquals((Long)34359640152l, item.get("Long"));
+        assertEquals((Long) 353332L, item.get("MemTotal"));
+        assertEquals((Long) 65420L, item.get("MemFree"));
+        assertEquals((Long) 20800L, item.get("Buffers"));
+        assertEquals((Long) 86204L, item.get("Cached"));
+        assertEquals((Long) 0L, item.get("SwapCached"));
+        assertEquals((Long) 34359640152L, item.get("Long"));
         assertNull(item.get("ExtraLongIgnore"));
         assertEquals(ArrayUtil.join("\n", inputBlock), item.getText());
     }
