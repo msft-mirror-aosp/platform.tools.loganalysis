@@ -343,6 +343,6 @@ public class EventsLogParserTest extends TestCase {
      * Reader to read the input from the given temp file
      */
     public BufferedReader readInputBuffer(File tempFile) throws IOException {
-        return (new BufferedReader(new InputStreamReader(new FileInputStream(tempFile))));
+        return new BufferedReader(new InputStreamReader(new FileInputStream(tempFile)));
     }
 }
