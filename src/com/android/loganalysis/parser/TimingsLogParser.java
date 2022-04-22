@@ -45,7 +45,7 @@ public class TimingsLogParser implements IParser {
 
     private static final String SYSTEM_SERVICES_TIME_PREFIX =
             "^\\d*-\\d*\\s*\\d*:\\d*:\\d*.\\d*\\s*"
-                    + "\\d*\\s*\\d*\\s*D\\s*(?<componentname>.*):\\s*(?<subname>\\S*)\\s*";
+                    + "\\d*\\s*\\d*\\s*V\\s*(?<componentname>.*):\\s*(?<subname>\\S*)\\s*";
     private static final String SYSTEM_SERVICES_TIME_SUFFIX = ":\\s*(?<time>.*)ms\\s*$";
 
     /** Used to parse time info from logcat lines */
@@ -61,7 +61,7 @@ public class TimingsLogParser implements IParser {
     /**
      * Match the line with system services duration info like:
      *
-     * <p>03-10 21:43:40.328 1005 1005 D SystemServerTiming:
+     * <p>03-10 21:43:40.328 1005 1005 V SystemServerTiming:
      * StartKeyAttestationApplicationIdProviderService took to complete: 3474ms
      */
     private static final Pattern SYSTEM_SERVICES_DURATION =
@@ -72,7 +72,7 @@ public class TimingsLogParser implements IParser {
     /**
      * Match the line with system services start time info like:
      *
-     * <p>01-10 01:25:57.249 989 989 D BootAnimation: BootAnimationStartTiming start time: 8343ms
+     * <p>01-10 01:25:57.249 989 989 V BootAnimation: BootAnimationStartTiming start time: 8343ms
      */
     private static final Pattern SYSTEM_SERVICES_START_TIME =
             Pattern.compile(
