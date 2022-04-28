@@ -192,6 +192,9 @@ public class LogcatParser implements IParser {
     @Override
     public LogcatItem parse(List<String> lines) {
         for (String line : lines) {
+            if (line == null) {
+                continue;
+            }
             parseLine(line);
         }
         commit();
