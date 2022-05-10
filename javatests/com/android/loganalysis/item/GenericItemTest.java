@@ -26,12 +26,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Unit test for {@link GenericItem}.
- */
+/** Unit test for {@link GenericItem}. */
 public class GenericItemTest extends TestCase {
-    private static final Set<String> ATTRIBUTES = new HashSet<String>(Arrays.asList(
-            "integer", "string"));
+    private static final Set<String> ATTRIBUTES =
+            new HashSet<String>(Arrays.asList("integer", "string"));
 
     private String mStringAttribute = "String";
     private Integer mIntegerAttribute = 1;
@@ -70,9 +68,7 @@ public class GenericItemTest extends TestCase {
         mInconsistentItem.setAttribute("integer", 2);
     }
 
-    /**
-     * Test for {@link GenericItem#mergeAttributes(IItem, Set)}.
-     */
+    /** Test for {@link GenericItem#mergeAttributes(IItem, Set)}. */
     public void testMergeAttributes() throws ConflictingItemException {
         Map<String, Object> attributes;
 
@@ -120,9 +116,7 @@ public class GenericItemTest extends TestCase {
         }
     }
 
-    /**
-     * Test for {@link GenericItem#isConsistent(IItem)}.
-     */
+    /** Test for {@link GenericItem#isConsistent(IItem)}. */
     public void testIsConsistent() {
         assertTrue(mEmptyItem1.isConsistent(mEmptyItem1));
         assertFalse(mEmptyItem1.isConsistent(null));
@@ -154,8 +148,8 @@ public class GenericItemTest extends TestCase {
     }
 
     /**
-     * Test for {@link GenericItem#setAttribute(String, Object)} and
-     * {@link GenericItem#getAttribute(String)}.
+     * Test for {@link GenericItem#setAttribute(String, Object)} and {@link
+     * GenericItem#getAttribute(String)}.
      */
     public void testAttributes() {
         GenericItem item = new GenericItem(ATTRIBUTES);
@@ -183,9 +177,7 @@ public class GenericItemTest extends TestCase {
         }
     }
 
-    /**
-     * Test for {@link GenericItem#areEqual(Object, Object)}
-     */
+    /** Test for {@link GenericItem#areEqual(Object, Object)} */
     public void testAreEqual() {
         assertTrue(GenericItem.areEqual(null, null));
         assertTrue(GenericItem.areEqual("test", "test"));
@@ -194,9 +186,7 @@ public class GenericItemTest extends TestCase {
         assertFalse(GenericItem.areEqual("test", ""));
     }
 
-    /**
-     * Test for {@link GenericItem#areConsistent(Object, Object)}
-     */
+    /** Test for {@link GenericItem#areConsistent(Object, Object)} */
     public void testAreConsistent() {
         assertTrue(GenericItem.areConsistent(null, null));
         assertTrue(GenericItem.areConsistent("test", "test"));
@@ -205,9 +195,7 @@ public class GenericItemTest extends TestCase {
         assertFalse(GenericItem.areConsistent("test", ""));
     }
 
-    /**
-     * Test for {@link GenericItem#mergeObjects(Object, Object)}
-     */
+    /** Test for {@link GenericItem#mergeObjects(Object, Object)} */
     public void testMergeObjects() throws ConflictingItemException {
         assertNull(GenericItem.mergeObjects(null, null));
         assertEquals("test", GenericItem.mergeObjects("test", "test"));
@@ -222,12 +210,14 @@ public class GenericItemTest extends TestCase {
         }
     }
 
-    /**
-     * Test that {@link GenericItem#toJson()} returns correctly.
-     */
+    /** Test that {@link GenericItem#toJson()} returns correctly. */
     public void testToJson() throws JSONException {
-        GenericItem item = new GenericItem(new HashSet<String>(Arrays.asList(
-                "string", "date", "object", "integer", "long", "float", "double", "item", "null")));
+        GenericItem item =
+                new GenericItem(
+                        new HashSet<String>(
+                                Arrays.asList(
+                                        "string", "date", "object", "integer", "long", "float",
+                                        "double", "item", "null")));
         Date date = new Date();
         Object object = new Object();
         NativeCrashItem subItem = new NativeCrashItem();
@@ -256,9 +246,9 @@ public class GenericItemTest extends TestCase {
         assertTrue(output.has("long"));
         assertEquals(1, output.get("long"));
         assertTrue(output.has("float"));
-        assertEquals(2.5, output.get("float"));
+        assertEquals("2.5", output.get("float").toString());
         assertTrue(output.has("double"));
-        assertEquals(3.5, output.get("double"));
+        assertEquals("3.5", output.get("double").toString());
         assertTrue(output.has("item"));
         assertTrue(output.get("item") instanceof JSONObject);
         assertFalse(output.has("null"));
