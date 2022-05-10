@@ -20,6 +20,7 @@ import com.android.loganalysis.item.DmesgActionInfoItem;
 import com.android.loganalysis.item.DmesgItem;
 import com.android.loganalysis.item.DmesgServiceInfoItem;
 import com.android.loganalysis.item.DmesgStageInfoItem;
+import com.android.loganalysis.item.DmesgModuleInfoItem;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -38,8 +39,15 @@ public class DmesgParserTest extends TestCase {
 
     private static final String BOOT_ANIMATION = "bootanim";
     private static final String NETD = "netd";
+    private static final String FOO = "foo";
+    private static final String BAR = "bar";
+    private static final String TOTAL_MODULE = "TOTAL_MODULE";
     private static final String[] LINES =
             new String[] {
+                "[    0.370107] init: Loading module /lib/modules/foo.ko with args ''",
+                "[    0.372497] init: Loaded kernel module /lib/modules/foo.ko",
+                "[    0.372500] init: Loading module /lib/modules/bar.ko with args ''",
+                "[    1.115467] init: Loaded 198 kernel modules took 748 ms",
                 "[    2.471163] init: Wait for property 'apexd.status=ready' took 403ms",
                 "[    3.786943] ueventd: Coldboot took 0.701291 seconds",
                 "[   22.962730] init: starting service 'bootanim'...",
@@ -50,12 +58,17 @@ public class DmesgParserTest extends TestCase {
                 "[   39.855818] init: Service 'bootanim' (pid 588) exited with status 0",
                 "[   41.665818] init: init first stage started!",
                 "[   44.942872] init: processing action (early-init) from (/init.rc:13)",
-                "[   47.233446] init: processing action (set_mmap_rnd_bits) from (<Builtin Action>:0)",
-                "[   47.240083] init: processing action (set_kptr_restrict) from (<Builtin Action>:0)",
+                "[   47.233446] init: processing action (set_mmap_rnd_bits) from (<Builtin "
+                        + "Action>:0)",
+                "[   47.240083] init: processing action (set_kptr_restrict) from (<Builtin"
+                        + " Action>:0)",
                 "[   47.245778] init: processing action (keychord_init) from (<Builtin Action>:0)",
-                "[   52.361049] init: processing action (persist.sys.usb.config=* boot) from (<Builtin Action>:0)",
-                "[   52.361108] init: processing action (enable_property_trigger) from (<Builtin Action>:0)",
-                "[   52.361313] init: processing action (security.perf_harden=1) from (/init.rc:677)",
+                "[   52.361049] init: processing action (persist.sys.usb.config=* boot) from"
+                        + " (<Builtin Action>:0)",
+                "[   52.361108] init: processing action (enable_property_trigger) from (<Builtin"
+                        + " Action>:0)",
+                "[   52.361313] init: processing action (security.perf_harden=1) from"
+                        + " (/init.rc:677)",
                 "[   52.361495] init: processing action (ro.debuggable=1) from (/init.rc:700)",
                 "[   58.298293] init: processing action (sys.boot_completed=1)",
                 "[   59.331069] ipa-wan ipa_wwan_ioctl:1428 dev(rmnet_data0) register to IPA",
@@ -72,6 +85,9 @@ public class DmesgParserTest extends TestCase {
 
     private static final List<DmesgActionInfoItem> EXPECTED_ACTION_INFO_ITEMS =
             getExpectedActionInfoItems();
+
+    private static final Map<String, DmesgModuleInfoItem> EXPECTED_MODULE_INFO_ITEMS =
+            getExpectedModuleInfoItems();
 
     /**
      * Test for empty dmesg logs passed to the DmesgParser
@@ -101,10 +117,15 @@ public class DmesgParserTest extends TestCase {
                 dmesgParser.getStageInfoItems().size());
         assertEquals("Action info items list size should be 9",9,
                 dmesgParser.getActionInfoItems().size());
+        assertEquals(
+                "Module info items list size should be 3",
+                3,
+                dmesgParser.getModuleInfoItems().size());
 
         assertEquals(EXPECTED_SERVICE_INFO_ITEMS, actualDmesgItem.getServiceInfoItems());
         assertEquals(EXPECTED_STAGE_INFO_ITEMS, actualDmesgItem.getStageInfoItems());
         assertEquals(EXPECTED_ACTION_INFO_ITEMS, actualDmesgItem.getActionInfoItems());
+        assertEquals(EXPECTED_MODULE_INFO_ITEMS, actualDmesgItem.getModuleInfoItems());
     }
 
     /**
@@ -121,6 +142,10 @@ public class DmesgParserTest extends TestCase {
                     dmesgParser.getStageInfoItems().size());
             assertEquals("Action info items list size should be 9",9,
                     dmesgParser.getActionInfoItems().size());
+            assertEquals(
+                    "Module info items list size should be 3",
+                    3,
+                    dmesgParser.getModuleInfoItems().size());
         }
     }
 
@@ -213,13 +238,30 @@ public class DmesgParserTest extends TestCase {
         assertEquals(EXPECTED_ACTION_INFO_ITEMS, actualActionInfoItems);
     }
 
+    /** Test incomplete module loaded pattern */
+    public void testIncompleteModuleInfo() {
+        DmesgParser dmesgParser = new DmesgParser();
+        for (String line : LINES) {
+            dmesgParser.parseModuleInfo(line);
+        }
+        List<DmesgModuleInfoItem> actualModuleInfoItems =
+                new ArrayList<>(dmesgParser.getModuleInfoItems().values());
+        assertEquals(EXPECTED_MODULE_INFO_ITEMS, dmesgParser.getModuleInfoItems());
+        assertEquals(3, actualModuleInfoItems.size());
+        assertEquals(
+                "Duration should be -1L",
+                Long.valueOf(-1L),
+                actualModuleInfoItems.get(0).getModuleDuration());
+    }
+
     private static List<DmesgActionInfoItem> getExpectedActionInfoItems() {
         return Arrays.asList(
                 new DmesgActionInfoItem("/init.rc:13", "early-init", 44942L),
                 new DmesgActionInfoItem("<Builtin Action>:0", "set_mmap_rnd_bits", 47233L),
                 new DmesgActionInfoItem("<Builtin Action>:0", "set_kptr_restrict", 47240L),
                 new DmesgActionInfoItem("<Builtin Action>:0", "keychord_init", 47245L),
-                new DmesgActionInfoItem("<Builtin Action>:0", "persist.sys.usb.config=* boot", 52361L),
+                new DmesgActionInfoItem(
+                        "<Builtin Action>:0", "persist.sys.usb.config=* boot", 52361L),
                 new DmesgActionInfoItem("<Builtin Action>:0", "enable_property_trigger", 52361L),
                 new DmesgActionInfoItem("/init.rc:677", "security.perf_harden=1", 52361L),
                 new DmesgActionInfoItem("/init.rc:700", "ro.debuggable=1", 52361L),
@@ -250,4 +292,26 @@ public class DmesgParserTest extends TestCase {
         return serviceInfoItemsMap;
     }
 
+    private static Map<String, DmesgModuleInfoItem> getExpectedModuleInfoItems() {
+        Map<String, DmesgModuleInfoItem> moduleInfoItemsMap = new HashMap<>();
+        DmesgModuleInfoItem fooModuleInfo = new DmesgModuleInfoItem();
+        fooModuleInfo.setModuleName(FOO);
+        fooModuleInfo.setStartTime(370L);
+        fooModuleInfo.setEndTime(372L);
+
+        DmesgModuleInfoItem barModuleInfo = new DmesgModuleInfoItem();
+        barModuleInfo.setModuleName(BAR);
+        barModuleInfo.setStartTime(372L);
+
+        DmesgModuleInfoItem totalInfoItem = new DmesgModuleInfoItem();
+        totalInfoItem.setModuleName(TOTAL_MODULE);
+        totalInfoItem.setModuleCount("198");
+        totalInfoItem.setModuleDuration(748L);
+
+        moduleInfoItemsMap.put(FOO, fooModuleInfo);
+        moduleInfoItemsMap.put(BAR, barModuleInfo);
+        moduleInfoItemsMap.put(TOTAL_MODULE, totalInfoItem);
+
+        return moduleInfoItemsMap;
+    }
 }
