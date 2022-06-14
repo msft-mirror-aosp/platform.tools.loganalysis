@@ -45,7 +45,7 @@ public class TimingsLogParser implements IParser {
 
     private static final String SYSTEM_SERVICES_TIME_PREFIX =
             "^\\d*-\\d*\\s*\\d*:\\d*:\\d*.\\d*\\s*"
-                    + "\\d*\\s*\\d*\\s*D\\s*(?<componentname>.*):\\s*(?<subname>\\S*)\\s*";
+                    + "\\d*\\s*\\d*\\s*[DV]\\s*(?<componentname>.*):\\s*(?<subname>\\S*)\\s*";
     private static final String SYSTEM_SERVICES_TIME_SUFFIX = ":\\s*(?<time>.*)ms\\s*$";
 
     /** Used to parse time info from logcat lines */
