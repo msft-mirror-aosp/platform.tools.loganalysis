@@ -50,6 +50,8 @@ public class DmesgParserTest extends TestCase {
                 "[    1.115467] init: Loaded 198 kernel modules took 748 ms",
                 "[    2.471163] init: Wait for property 'apexd.status=ready' took 403ms",
                 "[    3.786943] ueventd: Coldboot took 0.701291 seconds",
+                "[    4.295667] init: Command 'mount_all --late' action=late-fs "
+                        + "/vendor/etc/init/hw/init.rc:347) took 250ms and succeeded",
                 "[   22.962730] init: starting service 'bootanim'...",
                 "[   23.252321] init: starting service 'netd'...",
                 "[   29.331069] ipa-wan ipa_wwan_ioctl:1428 dev(rmnet_data0) register to IPA",
@@ -113,7 +115,9 @@ public class DmesgParserTest extends TestCase {
 
         assertEquals("Service info items list size should be 2", 2,
                 dmesgParser.getServiceInfoItems().size());
-        assertEquals("Stage info items list size should be 3",3,
+        assertEquals(
+                "Stage info items list size should be 4",
+                4,
                 dmesgParser.getStageInfoItems().size());
         assertEquals("Action info items list size should be 9",9,
                 dmesgParser.getActionInfoItems().size());
@@ -138,7 +142,9 @@ public class DmesgParserTest extends TestCase {
             dmesgParser.parseInfo(bufferedReader);
             assertEquals("Service info items list size should be 2", 2,
                     dmesgParser.getServiceInfoItems().size());
-            assertEquals("Stage info items list size should be 3", 3,
+            assertEquals(
+                    "Stage info items list size should be 4",
+                    4,
                     dmesgParser.getStageInfoItems().size());
             assertEquals("Action info items list size should be 9",9,
                     dmesgParser.getActionInfoItems().size());
@@ -223,7 +229,7 @@ public class DmesgParserTest extends TestCase {
             dmesgParser.parseStageInfo(line);
         }
         List<DmesgStageInfoItem> stageInfoItems = dmesgParser.getStageInfoItems();
-        assertEquals(3, stageInfoItems.size());
+        assertEquals(4, stageInfoItems.size());
         assertEquals(EXPECTED_STAGE_INFO_ITEMS, stageInfoItems);
     }
 
@@ -272,6 +278,7 @@ public class DmesgParserTest extends TestCase {
         return Arrays.asList(
                 new DmesgStageInfoItem("init_Wait for property 'apexd.status=ready'", null, 403L),
                 new DmesgStageInfoItem("ueventd_Coldboot", null, 701L),
+                new DmesgStageInfoItem("init_mount_all_late", null, 250L),
                 new DmesgStageInfoItem("first", 41665L, null));
     }
 
