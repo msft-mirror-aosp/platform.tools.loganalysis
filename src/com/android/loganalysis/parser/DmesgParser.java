@@ -49,12 +49,20 @@ public class DmesgParser implements IParser {
     private static final String TOTAL_MODULE = "TOTAL_MODULE";
     private static final String MOUNT_ALL = "mount_all";
 
+    private static final String TIMESTAMP_PATTERN =
+            String.format("\\[\\s+(?<%s>[\\d.]+)]", TIMESTAMP);
+
+    // This is optionally present in dmesg output on some kernels
+    // Matches possibly repeated pairs of square brackets enclosing arbitrary text
+    // An example is [   10.258464] [@3 insmod][....] aml dvb init
+    private static final String CPU_INFO_PATTERN = "(\\[[^]]+])+";
+
     // Matches: [ 14.822691] init:
-    private static final String SERVICE_PREFIX = String.format("^\\[\\s+(?<%s>.*)\\] init:\\s+",
-            TIMESTAMP);
+    private static final String SERVICE_PREFIX =
+            String.format("^%s( %s)? init:\\s+", TIMESTAMP_PATTERN, CPU_INFO_PATTERN);
     // Matches: [    3.791635] ueventd:
-    private static final String UEVENTD_PREFIX = String.format("^\\[\\s+(?<%s>.*)\\] ueventd:\\s+",
-            TIMESTAMP);
+    private static final String UEVENTD_PREFIX =
+            String.format("^%s( %s)? ueventd:\\s+", TIMESTAMP_PATTERN, CPU_INFO_PATTERN);
 
     // Matches: starting service 'ueventd'...
     private static final String START_SERVICE_SUFFIX = String.format("starting service "
