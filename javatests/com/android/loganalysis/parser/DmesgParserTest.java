@@ -220,6 +220,31 @@ public class DmesgParserTest extends TestCase {
         assertEquals("No service info should be available", 0, serviceInfoItems.size());
     }
 
+    public void testCompleteStageInfo_onKernel_5_15() {
+        DmesgParser dmesgParser = new DmesgParser();
+        String[] lines =
+                new String[] {
+                    "[    0.370107] [@2 init][....] init: Loading module /lib/modules/foo.ko "
+                            + "with args ''",
+                    "[    0.372497] [@2 init][....] init: Loaded kernel module /lib/modules/foo.ko",
+                    "[    0.372500] [@2 init][....] init: Loading module /lib/modules/bar.ko "
+                            + "with args ''",
+                    "[    1.115467] [@2 init][....] init: Loaded 198 kernel modules took 748 ms",
+                    "[    2.471163] [@2 init][....] init: Wait for property 'apexd.status=ready' "
+                            + "took 403ms",
+                    "[    3.786943] [@2 init][....] ueventd: Coldboot took 0.701291 seconds",
+                    "[    4.295667] [@2 init][....] init: Command 'mount_all --late' action=late-fs"
+                            + " /vendor/etc/init/hw/init.rc:347) took 250ms and succeeded",
+                    "[   41.665818] [@2 init][....] init: init first stage started!"
+                };
+        for (String line : lines) {
+            dmesgParser.parseStageInfo(line);
+        }
+        List<DmesgStageInfoItem> stageInfoItems = dmesgParser.getStageInfoItems();
+        assertEquals(4, stageInfoItems.size());
+        assertEquals(EXPECTED_STAGE_INFO_ITEMS, stageInfoItems);
+    }
+
     /**
      * Test init stages' start time logs
      */
