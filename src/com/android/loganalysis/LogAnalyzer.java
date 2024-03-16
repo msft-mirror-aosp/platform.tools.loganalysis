@@ -21,13 +21,11 @@ import com.android.loganalysis.item.IItem;
 import com.android.loganalysis.item.KernelLogItem;
 import com.android.loganalysis.item.LogcatItem;
 import com.android.loganalysis.item.MemoryHealthItem;
-import com.android.loganalysis.item.MonkeyLogItem;
 import com.android.loganalysis.parser.BugreportParser;
 import com.android.loganalysis.parser.DvmLockSampleParser;
 import com.android.loganalysis.parser.KernelLogParser;
 import com.android.loganalysis.parser.LogcatParser;
 import com.android.loganalysis.parser.MemoryHealthParser;
-import com.android.loganalysis.parser.MonkeyLogParser;
 import com.android.loganalysis.rule.RuleEngine;
 import com.android.loganalysis.rule.RuleEngine.RuleType;
 import com.android.loganalysis.util.config.ArgsOptionParser;
@@ -70,9 +68,6 @@ public class LogAnalyzer {
 
     @Option(name="kernel-log", description="The path to the kernel log")
     private String mKernelLogPath = null;
-
-    @Option(name="monkey-log", description="The path to the monkey log")
-    private String mMonkeyLogPath = null;
 
     @Option(name="memory-health", description="The path to the memory health log")
     private String mMemoryHealthLogPath = null;
@@ -130,13 +125,6 @@ public class LogAnalyzer {
                 reader = getBufferedReader(mKernelLogPath);
                 KernelLogItem kernelLog = new KernelLogParser().parse(reader);
                 printKernelLog(kernelLog);
-                return;
-            }
-
-            if (mMonkeyLogPath != null) {
-                reader = getBufferedReader(mMonkeyLogPath);
-                MonkeyLogItem monkeyLog = new MonkeyLogParser().parse(reader);
-                printMonkeyLog(monkeyLog);
                 return;
             }
 
@@ -255,16 +243,6 @@ public class LogAnalyzer {
     }
 
     /**
-     * Print the monkey log to stdout.
-     */
-    private void printMonkeyLog(MonkeyLogItem monkeyLog) {
-        if (OutputFormat.JSON.equals(mOutputFormat)) {
-            printJson(monkeyLog);
-        }
-        // TODO: Print monkey log in human readable form.
-    }
-
-    /**
      * Print a DVM log entry to stdout.
      */
     private void printDVMLog(DvmLockSampleItem dvmLog) {
@@ -338,7 +316,6 @@ public class LogAnalyzer {
         if (mBugreportPath != null) logCount++;
         if (mLogcatPath != null) logCount++;
         if (mKernelLogPath != null) logCount++;
-        if (mMonkeyLogPath != null) logCount++;
         if (mMemoryHealthLogPath != null) logCount++;
         return (logCount == 1);
     }
@@ -347,8 +324,9 @@ public class LogAnalyzer {
      * Print the usage for the command.
      */
     private void printUsage() {
-        System.err.println("Usage: loganalysis [--bugreport FILE | --events-log FILE | --logcat FILE | " +
-                "--kernel-log FILE | --monkey-log FILE]");
+        System.err.println(
+                "Usage: loganalysis [--bugreport FILE | --events-log FILE | --logcat FILE | "
+                        + "--kernel-log FILE]");
     }
 
     /**
